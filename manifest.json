@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "youtube video hider",
+  "version": "0.1",
+  "description": "This extension automatically hides videos based on user preferences.",
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {}
+}
