@@ -1,6 +1,22 @@
 console.log('content.js')
+setTimeout(() => {
+  const testEl = document.querySelector('#contents');
+  console.log('Element check after 3s:', testEl);
+
+  chrome.storage.local.get(['videos'], (result) => {
+    if (chrome.runtime.lastError) {
+      console.error('Storage error:', chrome.runtime.lastError);
+      return;
+    }
+  
+    const videosArr = result.videos
+    const onlyVideoTitles = videosArr.map(item => item.title)
+    remove(onlyVideoTitles)
+  })
+}, 3000);
 
 function remove(videoNames) {
+  console.log('removing....')
   const allVideosInfoEl = document.querySelectorAll('#contents > ytd-rich-item-renderer a#video-title-link')
 
   for (const element of allVideosInfoEl) {
@@ -39,16 +55,16 @@ function waitForElement(selector, callback) {
 
 waitForElement('#contents', (element) => {
   element.addEventListener('click', (e) => {
-      const url = e.target.closest('a#thumbnail').href
-      const title = e.target.closest('#dismissible').querySelector('#details a#video-title-link').title
+    const url = e.target.closest('a#thumbnail').href
+    const title = e.target.closest('#dismissible').querySelector('#details a#video-title-link').title
 
-      chrome.storage.local.get('videos', (result) => {
-        const savedVideos = result.videos || [];
-        savedVideos.push({title, url})
+    chrome.storage.local.get('videos', (result) => {
+      const savedVideos = result.videos || [];
+      savedVideos.push({ title, url })
 
-        chrome.storage.local.set({ videos: savedVideos}, () => {
-          console.log('Video info added to chrome.storage')
-        })
+      chrome.storage.local.set({ videos: savedVideos }, () => {
+        console.log('Video info added to chrome.storage')
       })
+    })
   });
 });

@@ -5,7 +5,7 @@ chrome.action.onClicked.addListener(async (tab) => {
 
   const result = await chrome.storage.local.get(['videos'])
   const videosArr = result.videos
-  const onlyTitles = videosArr.map(item => item.title)
+  const onlyVideoTitles = videosArr.map(item => item.title)
 
-  chrome.tabs.sendMessage(tab.id, {message: 'Remove videos', data: onlyTitles})
+  chrome.tabs.sendMessage(tab.id, {message: 'Remove videos', data: onlyVideoTitles})
 })
