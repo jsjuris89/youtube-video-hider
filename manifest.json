@@ -12,5 +12,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "action": {}
+  "action": {},
+  "options_page": "options.html",
+  "permissions": ["storage", "activeTab"]
 }

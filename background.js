@@ -1,9 +1,11 @@
 console.log('background.js')
 
-const searchArr = ['What even is an AI Agent?!', 'THIS BLEW MY MIND']
+chrome.action.onClicked.addListener(async (tab) => {
+  console.log('chrome.action - user clicked on extension icon!')
 
-chrome.action.onClicked.addListener((tab) => {
-  console.log('chrome.action running')
+  const result = await chrome.storage.local.get(['videos'])
+  const videosArr = result.videos
+  const onlyTitles = videosArr.map(item => item.title)
 
-  chrome.tabs.sendMessage(tab.id, {message: 'Remove videos', data: searchArr})
+  chrome.tabs.sendMessage(tab.id, {message: 'Remove videos', data: onlyTitles})
 })
