@@ -1,23 +1,37 @@
 console.log('content.js')
-setTimeout(() => {
-  const testEl = document.querySelector('#contents');
-  console.log('Element check after 3s:', testEl);
 
-  chrome.storage.local.get(['videos'], (result) => {
-    if (chrome.runtime.lastError) {
-      console.error('Storage error:', chrome.runtime.lastError);
-      return;
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach(mutation => {
+    // have full list of videos not just initial 2
+    if (mutation.target.matches('#contents') && mutation.addedNodes.length > 3) {
+      const videos = mutation.target.querySelectorAll('ytd-rich-item-renderer a#video-title-link')
+
+      chrome.storage.local.get(['videos'], (result) => {
+        if (chrome.runtime.lastError) {
+          console.error('Storage error:', chrome.runtime.lastError);
+          return;
+        }
+        const videosArr = result.videos
+        const onlyVideoTitles = videosArr.map(item => item.title)
+
+        for (const element of videos) {
+          onlyVideoTitles.forEach(videoTitle => {
+            if (element.title === videoTitle) {
+              element.closest('ytd-rich-item-renderer').remove()
+              console.log(`Video with title %c${videoTitle}%c was removed.`, 'color: darkorange;', '')
+            }
+          })
+        }
+      })
     }
-  
-    const videosArr = result.videos
-    const onlyVideoTitles = videosArr.map(item => item.title)
-    remove(onlyVideoTitles)
   })
-}, 3000);
-
+})
+observer.observe(document.body, { childList: true, subtree: true });
+  
 function remove(videoNames) {
   console.log('removing....')
   const allVideosInfoEl = document.querySelectorAll('#contents > ytd-rich-item-renderer a#video-title-link')
+  console.log('allVideosInfoEl:', allVideosInfoEl)
 
   for (const element of allVideosInfoEl) {
     videoNames.forEach(videoTitle => {
@@ -45,6 +59,7 @@ function waitForElement(selector, callback) {
     const observer = new MutationObserver(() => {
       const el = document.querySelector(selector);
       if (el) {
+        console.log('el:', el)
         observer.disconnect();
         callback(el);
       }
@@ -57,6 +72,7 @@ waitForElement('#contents', (element) => {
   element.addEventListener('click', (e) => {
     const url = e.target.closest('a#thumbnail').href
     const title = e.target.closest('#dismissible').querySelector('#details a#video-title-link').title
+    console.log(title, url)
 
     chrome.storage.local.get('videos', (result) => {
       const savedVideos = result.videos || [];
