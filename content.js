@@ -1,21 +1,13 @@
 console.log('content.js')
 
-// removes videos as user scrolls has nothing to do with initial load
 const observer = new MutationObserver((mutations) => {
-  
   mutations.forEach((mutation) => {
     // console.log('matches #contents:', mutation.target.matches('#contents'));
-    
-    // Check if the mutation happened in the #contents container
     if (mutation.target.matches('#contents')) {
-      // debug steps
-      if (mutation.addedNodes.length) {
-        console.log('mutation.target:', mutation.target);
-        console.log('addedNodes:', mutation.addedNodes.length);
-      }
-
+      // if (mutation.addedNodes.length) {
+      //   console.log('addedNodes:', mutation.addedNodes.length);
+      // }
       mutation.addedNodes.forEach((node) => {
-        // debug
         // console.log('show addedNodes node:', node)
         if (node.matches('ytd-rich-item-renderer')) {
           console.log('Actual node!')
@@ -39,28 +31,6 @@ const observer = new MutationObserver((mutations) => {
                 domEl.remove()
               }
             })
-          })
-        }
-
-        const videoLinkEl = node.querySelector('a#video-title-link');
-        if (videoLinkEl) {
-          chrome.storage.local.get(['videos'], (result) => {
-            const videosArr = result.videos
-            const onlyVideoTitles = videosArr.map(item => item.title)
-
-            const currentVideoTitle = videoLinkEl.title
-            // console.log('currentVideoTitle:', currentVideoTitle)
-
-            const test = onlyVideoTitles.some(item => {
-              return item === currentVideoTitle
-            })
-
-            if (test) {
-              // console.log(`Removed video ${currentVideoTitle}`)
-              videoLinkEl.closest('ytd-rich-item-renderer').remove()
-            } else {
-              // console.log('This video was not removed.')
-            }
           })
         }
       });
